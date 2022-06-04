@@ -24,6 +24,11 @@ class MainActivity : AppCompatActivity(), PresenterContract.View {
         setContentView(R.layout.activity_main)
         presenter.getName()
         subPresenter.getName()
+
+        supportFragmentManager.beginTransaction().apply {
+            add(R.id.clMain, MainFragment())
+            commit()
+        }
     }
 
     override fun setName(name: String) {
