@@ -1,42 +1,37 @@
 package com.example.hilt_abstract_sample1
 
-import android.app.Activity
-import dagger.Component
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.components.FragmentComponent
-import javax.inject.Qualifier
-
-@Qualifier
-annotation class Main
-
-@Qualifier
-annotation class Sub
+import dagger.hilt.components.SingletonComponent
 
 @InstallIn(ActivityComponent::class)
 @Module
 object MainModule {
     @Provides
-    fun provideMainView(activity: Activity): PresenterContract.View {
-        return activity as PresenterContract.View
+    fun provideCountUseCase(
+        countRepository: CountRepository,
+    ): CountUseCase {
+        return CountUseCase(countRepository)
     }
+}
 
-    @Main
-    @Provides
-    fun provideMainPresenter(
-        view: PresenterContract.View
-    ): PresenterContract.Presenter {
-        return MainPresenter(view)
-    }
+@InstallIn(SingletonComponent::class)
+@Module
+abstract class RepositoryModule {
+    @Binds
+    abstract fun bindCountRepository(countRepositoryImpl: CountRepositoryImpl): CountRepository
+}
 
-    @Sub
+@InstallIn(SingletonComponent::class)
+@Module
+object NetworkModule {
     @Provides
-    fun provideSubPresenter(
-        view: PresenterContract.View
-    ): PresenterContract.Presenter {
-        return SubPresenter(view)
+    fun provideCoroutine(): Coroutine {
+        return CoroutineImpl()
     }
 }
 

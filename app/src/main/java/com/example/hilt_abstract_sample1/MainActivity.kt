@@ -12,55 +12,49 @@ import javax.inject.Inject
 class MainApplication : Application()
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), PresenterContract.View {
-    @Main
-    @Inject lateinit var presenter: PresenterContract.Presenter
-
-    @Sub
-    @Inject lateinit var subPresenter: PresenterContract.Presenter
+class MainActivity : AppCompatActivity() {
+    @Inject
+    lateinit var countUseCase: CountUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        presenter.getName()
-        subPresenter.getName()
+
+        Log.d("Tatsuya\uD83D\uDC32", "onCreate: ${countUseCase.plus()}")
 
         supportFragmentManager.beginTransaction().apply {
             add(R.id.clMain, MainFragment())
             commit()
         }
     }
+}
 
-    override fun setName(name: String) {
-        Log.d("Tatsuya🐲", "onCreate: ${name}")
+class CountUseCase @Inject constructor(
+    private val countRepository: CountRepository,
+) {
+    fun plus(): Int {
+        return countRepository.plus()
     }
 }
 
-interface PresenterContract {
-    interface View {
-        fun setName(name: String)
-    }
+interface CountRepository {
+    fun plus(): Int
+}
 
-    interface Presenter {
-        fun getName()
+class CountRepositoryImpl @Inject constructor(
+    private val coroutine: Coroutine,
+) : CountRepository {
+    private var count = coroutine.fetch()
+    override fun plus(): Int {
+        count++
+        return count
     }
 }
 
-abstract class BasePresenter() : PresenterContract.Presenter {
+interface Coroutine {
+    fun fetch(): Int
 }
 
-class MainPresenter @Inject constructor(
-    val view: PresenterContract.View
-) : BasePresenter() {
-    override fun getName() {
-        view.setName("Tatsuya")
-    }
-}
-
-class SubPresenter @Inject constructor(
-    val view: PresenterContract.View
-) : BasePresenter() {
-    override fun getName() {
-        view.setName("SubTatsuya")
-    }
+class CoroutineImpl : Coroutine {
+    override fun fetch(): Int { return 100 }
 }
