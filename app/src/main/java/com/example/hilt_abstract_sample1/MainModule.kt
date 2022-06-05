@@ -6,6 +6,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.FragmentComponent
 import javax.inject.Qualifier
 
 @Qualifier
@@ -36,5 +37,15 @@ object MainModule {
         view: PresenterContract.View
     ): PresenterContract.Presenter {
         return SubPresenter(view)
+    }
+}
+
+@InstallIn(FragmentComponent::class)
+@Module
+object FragmentModule {
+    @Provides
+    fun provideCount(
+    ): Count {
+        return CountImpl()
     }
 }
